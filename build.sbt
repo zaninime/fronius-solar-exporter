@@ -11,4 +11,8 @@ lazy val root = (project in file("."))
     libraryDependencies ++= appDeps
   )
 
+enablePlugins(JavaAppPackaging)
+enablePlugins(UniversalPlugin)
+enablePlugins(LinuxPlugin)
+
 // See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for instructions on how to publish to Sonatype.

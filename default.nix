@@ -9,7 +9,7 @@ in sbt.mkDerivation rec {
   pname = "fronius-solar-exporter";
   version = "0.0.1";
 
-  depsSha256 = "0000000000000000000000000000000000000000000000000000";
+  depsSha256 = "19gl5n0kiabr8vkda8ppfzmyrya4393jfdijq7yq2ksp6a391gwj";
 
   nativeBuildInputs = [ makeWrapper ];
 
