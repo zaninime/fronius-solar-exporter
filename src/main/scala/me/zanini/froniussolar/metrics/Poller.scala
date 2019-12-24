@@ -1,5 +1,6 @@
 package me.zanini.froniussolar.metrics
 
+import cats.Parallel
 import cats.effect.{Sync, Timer}
 import fs2.Stream
 import io.chrisdavenport.log4cats.Logger
@@ -18,7 +19,8 @@ trait Poller[F[_]] {
   def run(interval: FiniteDuration): F[Unit]
 }
 
-class PollerImpl[F[_]: Sync: Timer: Logger](httpClient: Client[F], site: Site)
+class PollerImpl[F[_]: Sync: Timer: Logger: Parallel](httpClient: Client[F],
+                                                      site: Site)
     extends Poller[F] {
   val solarClient = new Http4sSolarClient[F](httpClient, site)
   val updateService = new UpdateServiceImpl[F](site)

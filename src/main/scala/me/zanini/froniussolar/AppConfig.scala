@@ -1,14 +1,17 @@
 package me.zanini.froniussolar
 
-import monix.eval.Task
+import cats.data.NonEmptyList
+import cats.effect.Sync
 import org.http4s.Uri
 import pureconfig.{ConfigReader, ConfigSource}
-import pureconfig.error.{ConfigReaderFailures, FailureReason}
+import pureconfig.error.FailureReason
 import pureconfig.generic.auto._
+import pureconfig.module.catseffect.syntax._
+import pureconfig.module.cats._
 
 import scala.concurrent.duration.FiniteDuration
 
-case class AppConfig(sites: List[SiteConfig])
+case class AppConfig(sites: NonEmptyList[SiteConfig])
 case class SiteConfig(name: String, baseUrl: Uri, pollInterval: FiniteDuration)
     extends Site
 
@@ -28,8 +31,6 @@ object AppConfig {
             override def description: String = error.message
         }))
 
-  def readDefault = {
-    Task.fromEither((err: ConfigReaderFailures) =>
-      new Exception(err.prettyPrint()))(ConfigSource.default.load[AppConfig])
-  }
+  def readDefault[F[_]: Sync]: F[AppConfig] =
+    ConfigSource.default.loadF[F, AppConfig]
 }

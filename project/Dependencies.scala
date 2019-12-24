@@ -9,7 +9,8 @@ object Dependencies {
 
   private lazy val monix = Seq("io.monix" %% "monix" % "3.1.0")
 
-  private lazy val prometheus = Seq("", "_httpserver").map(lib => "io.prometheus" % s"simpleclient$lib" % "0.8.0")
+  private lazy val prometheus = Seq("", "_httpserver").map(lib =>
+    "io.prometheus" % s"simpleclient$lib" % "0.8.0")
 
   private lazy val http4s =
     Seq("blaze-server", "blaze-client", "circe", "dsl").map(lib =>
@@ -26,11 +27,13 @@ object Dependencies {
   private lazy val log4cats = Seq("core", "slf4j").map(lib =>
     "io.chrisdavenport" %% s"log4cats-$lib" % "1.0.1")
 
-  private lazy val pureconfig = Seq("com.github.pureconfig" %% "pureconfig" % "0.12.2")
+  private lazy val pureconfig =
+    Seq("", "-cats", "-cats-effect").map(lib =>
+      "com.github.pureconfig" %% s"pureconfig$lib" % "0.12.2")
 
   private lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.0.8"
 
   lazy val appDeps
-  : Seq[ModuleID] = monix ++ cats ++ fs2 ++ prometheus ++ http4s ++ circe ++ circeYaml ++ slf4j ++ log4cats ++ pureconfig ++ testDeps
+    : Seq[ModuleID] = monix ++ cats ++ fs2 ++ prometheus ++ http4s ++ circe ++ circeYaml ++ slf4j ++ log4cats ++ pureconfig ++ testDeps
   lazy val testDeps: Seq[ModuleID] = Seq(scalaTest).map(_ % Test)
 }

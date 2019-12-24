@@ -1,22 +1,36 @@
 package me.zanini.froniussolar.metrics
 
 import io.prometheus.client.Gauge
-import me.zanini.froniussolar.metrics.Constants.METRICS_NS
+import me.zanini.froniussolar.metrics.Constants.SITE_METRICS_NS
 
 object SiteMetrics {
-  val totalEnergyMetric: Gauge = Gauge
-    .build()
-    .namespace(METRICS_NS)
-    .name("daily_energy_wh")
-    .help("Energy produced today")
-    .labelNames("site")
-    .register()
+  private val commonLabels = List("site")
 
-  val lastSuccessfulQueryMetric: Gauge = Gauge
-    .build()
-    .namespace(METRICS_NS)
-    .name("last_successful_query")
-    .help("When the site was last successfully queried")
-    .labelNames("site")
-    .register()
+  private case class GaugeMetric(name: String,
+                                 help: String,
+                                 labelNames: List[String]) {
+    def register: Gauge =
+      Gauge
+        .build(name, help)
+        .namespace(SITE_METRICS_NS)
+        .labelNames(labelNames: _*)
+        .register()
+  }
+  val modeMetric: Gauge = GaugeMetric(
+    "mode",
+    "0 = not in this mode, 1 = running in this mode",
+    commonLabels ++ List("mode")).register
+
+  val powerMetric: Gauge = GaugeMetric("power_watts",
+                                       "Instant power, -1 when N/A",
+                                       commonLabels ++ List("device")).register
+
+  val energyMetric: Gauge = GaugeMetric("energy_watthours",
+                                        "Cumulative energy, -1 when N/A",
+                                        commonLabels ++ List("period")).register
+
+  val lastSuccessfulQueryMetric: Gauge = GaugeMetric(
+    "last_successful_query",
+    "When the site was last successfully queried",
+    commonLabels).register
 }

@@ -1,5 +1,6 @@
 package me.zanini.froniussolar
 
+import cats.Parallel
 import cats.effect.{ExitCode, Sync, Timer}
 import cats.instances.list._
 import cats.syntax.parallel._
@@ -19,18 +20,21 @@ object Boot extends TaskApp {
   override def run(args: List[String]): Task[ExitCode] =
     BlazeClientBuilder[Task](ExecutionContext.global).resource.use { client =>
       for {
-        _ <- Logger[Task].info("Hello world")
+        _ <- Logger[Task].info("Initializing")
         config <- AppConfig.readDefault
+        _ <- Logger[Task].info("Starting HTTP server")
         server <- Task(new HTTPServer(8079)).start
-        pollers <- createPollers[Task](config.sites, client)
+        _ <- Logger[Task].info("Starting pollers")
+        pollers <- createPollers[Task](config.sites.toList, client)
           .map(_.start)
           .parSequence
+        _ <- Logger[Task].info("Ready")
         _ <- server.join
         _ <- pollers.map(_.join).parSequence
       } yield ExitCode.Success
     }
 
-  private def createPollers[F[_]: Sync: Timer: Logger](
+  private def createPollers[F[_]: Sync: Timer: Logger: Parallel](
       sites: List[SiteConfig],
       httpClient: Client[F]) = {
     sites.map(site =>

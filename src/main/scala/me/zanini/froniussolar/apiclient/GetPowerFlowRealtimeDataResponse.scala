@@ -3,6 +3,13 @@ package me.zanini.froniussolar.apiclient
 import io.circe.Json
 
 object GetPowerFlowRealtimeDataResponse {
+  sealed trait Mode
+  case object ProduceOnly extends Mode
+  case object Meter extends Mode
+  case object VagueMeter extends Mode
+  case object Bidirectional extends Mode
+  case object ACCoupled extends Mode
+
   case class Inverter(
       DT: Double,
       E_Day: Double,
@@ -33,17 +40,19 @@ object GetPowerFlowRealtimeDataResponse {
   )
 
   case class Site(
-      E_Day: Double,
-      E_Total: Double,
-      E_Year: Double,
-      Meter_Location: String,
-      Mode: String,
-      P_Akku: Double,
-      P_Grid: Double,
-      P_Load: Double,
-      P_PV: Double,
-      rel_Autonomy: Json,
-      rel_SelfConsumption: Json
+      Mode: Mode,
+      BatteryStandby: Option[Boolean],
+      BackupMode: Option[Boolean],
+      P_Akku: Option[Double],
+      P_Grid: Option[Double],
+      P_Load: Option[Double],
+      P_PV: Option[Double],
+      rel_Autonomy: Option[Double],
+      rel_SelfConsumption: Option[Double],
+      Meter_Location: Option[String],
+      E_Day: Option[Double],
+      E_Total: Option[Double],
+      E_Year: Option[Double],
   )
 
   case class Status(
