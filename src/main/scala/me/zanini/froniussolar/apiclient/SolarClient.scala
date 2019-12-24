@@ -30,6 +30,15 @@ class Http4sSolarClient[F[_]: Sync](client: Client[F], site: Site)
       case _ => Left("Invalid mode")
     }
 
+  implicit def meterLocationDecoder
+    : Decoder[GetPowerFlowRealtimeDataResponse.MeterLocation] =
+    Decoder[String].emap {
+      case "grid"    => Right(GetPowerFlowRealtimeDataResponse.Grid)
+      case "meter"   => Right(GetPowerFlowRealtimeDataResponse.Load)
+      case "unknown" => Right(GetPowerFlowRealtimeDataResponse.Unknown)
+      case _         => Left("Invalid meter location")
+    }
+
   override def getPowerFlowRealtimeData
     : F[GetPowerFlowRealtimeDataResponse.Root] = {
     client.expect[GetPowerFlowRealtimeDataResponse.Root](

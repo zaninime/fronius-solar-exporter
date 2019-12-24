@@ -10,6 +10,11 @@ object GetPowerFlowRealtimeDataResponse {
   case object Bidirectional extends Mode
   case object ACCoupled extends Mode
 
+  sealed trait MeterLocation
+  case object Load extends MeterLocation
+  case object Grid extends MeterLocation
+  case object Unknown extends MeterLocation
+
   case class Inverter(
       DT: Double,
       E_Day: Double,
@@ -49,7 +54,7 @@ object GetPowerFlowRealtimeDataResponse {
       P_PV: Option[Double],
       rel_Autonomy: Option[Double],
       rel_SelfConsumption: Option[Double],
-      Meter_Location: Option[String],
+      Meter_Location: Option[MeterLocation],
       E_Day: Option[Double],
       E_Total: Option[Double],
       E_Year: Option[Double],
