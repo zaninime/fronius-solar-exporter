@@ -27,7 +27,7 @@ class Http4sSolarClient[F[_]: Sync](client: Client[F], site: Site)
         Right(GetPowerFlowRealtimeDataResponse.Bidirectional)
       case "ac-coupled" =>
         Right(GetPowerFlowRealtimeDataResponse.ACCoupled)
-      case _ => Left("Invalid mode")
+      case _ => Left("Invalid site mode")
     }
 
   implicit def meterLocationDecoder
@@ -37,6 +37,29 @@ class Http4sSolarClient[F[_]: Sync](client: Client[F], site: Site)
       case "meter"   => Right(GetPowerFlowRealtimeDataResponse.Load)
       case "unknown" => Right(GetPowerFlowRealtimeDataResponse.Unknown)
       case _         => Left("Invalid meter location")
+    }
+
+  implicit def batteryModeDecoder
+    : Decoder[GetPowerFlowRealtimeDataResponse.BatteryMode] =
+    Decoder[String].emap {
+      case "disabled"     => Right(GetPowerFlowRealtimeDataResponse.Disabled)
+      case "normal"       => Right(GetPowerFlowRealtimeDataResponse.Normal)
+      case "service"      => Right(GetPowerFlowRealtimeDataResponse.Service)
+      case "charge boost" => Right(GetPowerFlowRealtimeDataResponse.ChargeBoost)
+      case "nearly depleted" =>
+        Right(GetPowerFlowRealtimeDataResponse.NearlyDepleted)
+      case "suspended"    => Right(GetPowerFlowRealtimeDataResponse.Suspended)
+      case "calibrate"    => Right(GetPowerFlowRealtimeDataResponse.Calibrate)
+      case "grid support" => Right(GetPowerFlowRealtimeDataResponse.GridSupport)
+      case "deplete recovery" =>
+        Right(GetPowerFlowRealtimeDataResponse.DepleteRecovery)
+      case "non operable (voltage)" =>
+        Right(GetPowerFlowRealtimeDataResponse.NonOperableVoltage)
+      case "non operable (temperature)" =>
+        Right(GetPowerFlowRealtimeDataResponse.NonOperableTemperature)
+      case "preheating" => Right(GetPowerFlowRealtimeDataResponse.Preheating)
+      case "startup"    => Right(GetPowerFlowRealtimeDataResponse.Startup)
+      case _            => Left("Invalid battery mode")
     }
 
   override def getPowerFlowRealtimeData

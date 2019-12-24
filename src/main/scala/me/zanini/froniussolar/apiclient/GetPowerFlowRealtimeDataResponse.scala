@@ -15,12 +15,29 @@ object GetPowerFlowRealtimeDataResponse {
   case object Grid extends MeterLocation
   case object Unknown extends MeterLocation
 
+  sealed trait BatteryMode
+  case object Disabled extends BatteryMode
+  case object Normal extends BatteryMode
+  case object Service extends BatteryMode
+  case object ChargeBoost extends BatteryMode
+  case object NearlyDepleted extends BatteryMode
+  case object Suspended extends BatteryMode
+  case object Calibrate extends BatteryMode
+  case object GridSupport extends BatteryMode
+  case object DepleteRecovery extends BatteryMode
+  case object NonOperableVoltage extends BatteryMode
+  case object NonOperableTemperature extends BatteryMode
+  case object Preheating extends BatteryMode
+  case object Startup extends BatteryMode
+
   case class Inverter(
-      DT: Double,
-      E_Day: Double,
-      E_Total: Double,
-      E_Year: Double,
-      P: Double
+      DT: Int,
+      P: Int,
+      SOC: Option[Int],
+      Battery_Mode: Option[BatteryMode],
+      E_Day: Option[Double],
+      E_Total: Option[Double],
+      E_Year: Option[Double],
   )
 
   case class Body(

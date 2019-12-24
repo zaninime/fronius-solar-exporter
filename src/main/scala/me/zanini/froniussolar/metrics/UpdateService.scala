@@ -22,7 +22,8 @@ class UpdateServiceImpl[F[_]: Parallel](site: Site)(implicit F: Sync[F])
         .setToCurrentTime()
     } *> setSiteEnergyPower(response.Body.Data.Site) *> setSiteMode(
       response.Body.Data.Site.Mode) *> setMeterLocation(
-      response.Body.Data.Site.Meter_Location)
+      response.Body.Data.Site.Meter_Location) *> setInvertersMetrics(
+      response.Body.Data)
 
   private def setSiteEnergyPower(
       siteData: GetPowerFlowRealtimeDataResponse.Site): F[Unit] =
@@ -113,6 +114,92 @@ class UpdateServiceImpl[F[_]: Parallel](site: Site)(implicit F: Sync[F])
         F.delay(
           SiteMetrics.meterLocationMetric
             .labels(site.name, Show[MeterLocation].show(currentLocation))
+            .set(bool2double(isEnabled)))
+      })
+      .parSequence
+      .as(())
+  }
+
+  private def setInvertersMetrics(data: GetPowerFlowRealtimeDataResponse.Data) =
+    data.Inverters.toList
+      .map {
+        case (deviceId, inverter) => setInverterMetrics(deviceId, inverter)
+      }
+      .parSequence
+      .as(())
+
+  private def setInverterMetrics(
+      deviceId: String,
+      inverterData: GetPowerFlowRealtimeDataResponse.Inverter) = {
+    List(
+      F.delay(
+        InverterMetrics.deviceTypeMetric
+          .labels(site.name, deviceId)
+          .set(inverterData.DT.toDouble)),
+      F.delay(
+        InverterMetrics.powerMetric
+          .labels(site.name, deviceId)
+          .set(inverterData.P.toDouble)),
+      F.delay(
+        InverterMetrics.chargeMetric
+          .labels(site.name, deviceId)
+          .set(inverterData.SOC.fold(Double.NaN)(_.toDouble))),
+      F.delay(
+        InverterMetrics.energyMetric
+          .labels(site.name, deviceId, "day")
+          .set(inverterData.E_Day.getOrElse(Double.NaN))),
+      F.delay(
+        InverterMetrics.energyMetric
+          .labels(site.name, deviceId, "year")
+          .set(inverterData.E_Year.getOrElse(Double.NaN))),
+      F.delay(
+        InverterMetrics.energyMetric
+          .labels(site.name, deviceId, "total")
+          .set(inverterData.E_Total.getOrElse(Double.NaN))),
+      setInverterBatteryMode(deviceId, inverterData.Battery_Mode)
+    ).parSequence.as(())
+  }
+
+  private def setInverterBatteryMode(
+      deviceId: String,
+      mode: Option[GetPowerFlowRealtimeDataResponse.BatteryMode]) = {
+    import GetPowerFlowRealtimeDataResponse._
+
+    implicit def showMode: Show[BatteryMode] = {
+      case Disabled                                => "disabled"
+      case GetPowerFlowRealtimeDataResponse.Normal => "normal"
+      case Service                                 => "service"
+      case ChargeBoost                             => "charge-boost"
+      case NearlyDepleted                          => "nearly-depleted"
+      case Suspended                               => "suspended"
+      case Calibrate                               => "calibrate"
+      case GridSupport                             => "grid-support"
+      case DepleteRecovery                         => "deplete-recovery"
+      case NonOperableVoltage                      => "non-operable-voltage"
+      case NonOperableTemperature                  => "non-operable-temperature"
+      case Preheating                              => "preheating"
+      case Startup                                 => "startup"
+    }
+
+    List(
+      Disabled,
+      Normal,
+      Service,
+      ChargeBoost,
+      NearlyDepleted,
+      Suspended,
+      Calibrate,
+      GridSupport,
+      DepleteRecovery,
+      NonOperableVoltage,
+      NonOperableTemperature,
+      Preheating,
+      Startup
+    ).map(currentMode => {
+        val isEnabled = mode.fold(false)(thisMode => thisMode == currentMode)
+        F.delay(
+          InverterMetrics.batteryModeMetric
+            .labels(site.name, deviceId, Show[BatteryMode].show(currentMode))
             .set(bool2double(isEnabled)))
       })
       .parSequence
