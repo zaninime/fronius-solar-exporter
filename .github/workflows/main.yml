@@ -1,3 +1,4 @@
+---
 name: CI
 
 on: [push]
@@ -14,6 +15,6 @@ jobs:
       uses: cachix/install-nix-action@v6
     - name: Fix kvm
       run: >
-        echo "system-features = kvm" >> /etc/nix/nix.conf
+        sudo sh -c 'echo "system-features = kvm" >> /etc/nix/nix.conf'
     - name: Run a one-line script
       run: nix-build -A containerImage release.nix
