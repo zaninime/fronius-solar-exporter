@@ -7,7 +7,7 @@ let
   mainClass = "me.zanini.froniussolar.Boot";
 in sbt.mkDerivation rec {
   pname = "fronius-solar-exporter";
-  version = "0.4.1";
+  version = "0.5.0";
 
   depsSha256 = "0284wna0kbza8dj698pfav7bfzq4135s2ibxarx5inxi6dqqi0q6";
 

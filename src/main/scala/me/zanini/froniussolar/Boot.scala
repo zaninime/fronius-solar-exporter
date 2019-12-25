@@ -37,7 +37,9 @@ object Boot extends TaskApp {
   private def createPollers[F[_]: Sync: Timer: Logger: Parallel](
       sites: List[SiteConfig],
       httpClient: Client[F]) = {
-    sites.map(site =>
-      new PollerImpl[F](httpClient, site).run(site.pollInterval))
+    sites.map(
+      site =>
+        new PollerImpl[F](httpClient, site)
+          .run(site.pollInterval, site.warnOnNetworkError))
   }
 }

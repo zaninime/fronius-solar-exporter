@@ -12,7 +12,10 @@ import pureconfig.module.cats._
 import scala.concurrent.duration.FiniteDuration
 
 case class AppConfig(sites: NonEmptyList[SiteConfig])
-case class SiteConfig(name: String, baseUrl: Uri, pollInterval: FiniteDuration)
+case class SiteConfig(name: String,
+                      baseUrl: Uri,
+                      pollInterval: FiniteDuration,
+                      warnOnNetworkError: Boolean)
     extends Site
 
 trait Site {
