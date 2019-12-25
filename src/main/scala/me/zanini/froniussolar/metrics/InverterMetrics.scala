@@ -17,21 +17,21 @@ object InverterMetrics {
         .register()
   }
 
-  def deviceTypeMetric: Gauge =
+  val deviceTypeMetric: Gauge =
     GaugeMetric("device_type", "Device type", commonLabels).register
 
-  def powerMetric: Gauge =
+  val powerMetric: Gauge =
     GaugeMetric("power_watts", "Current power", commonLabels).register
 
-  def chargeMetric: Gauge =
+  val chargeMetric: Gauge =
     GaugeMetric("battery_charge_percent",
                 "Current battery charge",
                 commonLabels).register
 
-  def batteryModeMetric: Gauge =
+  val batteryModeMetric: Gauge =
     GaugeMetric("battery_mode", "Battery mode", commonLabels ++ List("mode")).register
 
-  def energyMetric: Gauge =
+  val energyMetric: Gauge =
     GaugeMetric("energy_watthours",
                 "Cumulative energy",
                 commonLabels ++ List("period")).register

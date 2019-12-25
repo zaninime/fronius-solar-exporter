@@ -17,41 +17,41 @@ object SiteMetrics {
         .register()
   }
 
-  def modeMetric: Gauge =
+  val modeMetric: Gauge =
     GaugeMetric("mode",
                 "0 = not in this mode, 1 = running in this mode",
                 commonLabels ++ List("mode")).register
 
-  def batteryStandbyMetric: Gauge =
+  val batteryStandbyMetric: Gauge =
     GaugeMetric("battery_standby", "1 = standby, 0 = off", commonLabels).register
 
-  def backupModeMetric: Gauge =
+  val backupModeMetric: Gauge =
     GaugeMetric("backup_mode", "1 = active, 0 = inactive", commonLabels).register
 
-  def powerMetric: Gauge =
+  val powerMetric: Gauge =
     GaugeMetric("power_watts", "Instant power", commonLabels ++ List("device")).register
 
-  def energyMetric: Gauge =
+  val energyMetric: Gauge =
     GaugeMetric("energy_watthours",
                 "Cumulative energy",
                 commonLabels ++ List("period")).register
 
-  def selfConsumptionPercentMetric: Gauge =
+  val selfConsumptionPercentMetric: Gauge =
     GaugeMetric("self_consumption_percent",
                 "Current relative self consumption in %",
                 commonLabels).register
 
-  def autonomyPercentMetric: Gauge =
+  val autonomyPercentMetric: Gauge =
     GaugeMetric("autonomy_percent",
                 "Current relative autonomy in %",
                 commonLabels).register
 
-  def meterLocationMetric: Gauge =
+  val meterLocationMetric: Gauge =
     GaugeMetric("meter_location",
                 "unknown = backup power",
                 commonLabels ++ List("location")).register
 
-  def lastSuccessfulQueryMetric: Gauge =
+  val lastSuccessfulQueryMetric: Gauge =
     GaugeMetric("last_successful_query",
                 "When the site was last successfully queried",
                 commonLabels).register
