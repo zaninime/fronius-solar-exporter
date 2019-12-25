@@ -8,7 +8,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: cachix/install-nix-action@v6
-    - uses: actions/checkout@v1
+    - name: Checkout code
+      uses: actions/checkout@v1
+    - name: Install Nix
+      uses: cachix/install-nix-action@v6
+    - name: Fix kvm
+      run: >
+        echo "system-features = kvm" >> /etc/nix/nix.conf
     - name: Run a one-line script
       run: nix-build -A containerImage release.nix
