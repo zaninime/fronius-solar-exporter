@@ -16,5 +16,12 @@ jobs:
     - name: Fix kvm
       run: >
         sudo sh -c 'echo "system-features = kvm" >> /etc/nix/nix.conf'
-    - name: Run a one-line script
-      run: nix-build -A containerImage release.nix
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build container image
+      run: nix-build -A pushImage release.nix
+    - name: Push image
+      run: ./result --authfile "$DOCKER_CONFIG/config.json"
