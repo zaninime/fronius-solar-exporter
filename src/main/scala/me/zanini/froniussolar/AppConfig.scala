@@ -24,15 +24,18 @@ trait Site {
 }
 
 object AppConfig {
-  implicit def uriConfigReader: ConfigReader[Uri] =
+  implicit val uriConfigReader: ConfigReader[Uri] =
     ConfigReader[String].emap(
       Uri
         .fromString(_)
         .left
-        .map(error =>
-          new FailureReason {
-            override def description: String = error.message
-        }))
+        .map(
+          error =>
+            new FailureReason {
+              override def description: String = error.message
+          }
+        )
+    )
 
   def readDefault[F[_]: Sync]: F[AppConfig] =
     ConfigSource.default.loadF[F, AppConfig]

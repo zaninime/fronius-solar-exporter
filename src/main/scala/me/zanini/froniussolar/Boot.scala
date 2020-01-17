@@ -7,7 +7,8 @@ import cats.syntax.parallel._
 import io.chrisdavenport.log4cats.Logger
 import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
 import io.prometheus.client.exporter.HTTPServer
-import me.zanini.froniussolar.metrics.PollerImpl
+import me.zanini.froniussolar.apiclient.Http4sSolarClient
+import me.zanini.froniussolar.metrics.{PollerImpl, UpdateServiceImpl}
 import monix.eval.{Task, TaskApp}
 import org.http4s.client.Client
 import org.http4s.client.blaze.BlazeClientBuilder
@@ -35,11 +36,15 @@ object Boot extends TaskApp {
     }
 
   private def createPollers[F[_]: Sync: Timer: Logger: Parallel](
-      sites: List[SiteConfig],
-      httpClient: Client[F]) = {
-    sites.map(
-      site =>
-        new PollerImpl[F](httpClient, site)
-          .run(site.pollInterval, site.warnOnNetworkError))
+    sites: List[SiteConfig],
+    httpClient: Client[F]
+  ) = {
+    sites.map(site => {
+      val solarClient = new Http4sSolarClient[F](httpClient, site)
+      val updateService = new UpdateServiceImpl[F](site)
+
+      new PollerImpl[F](solarClient, updateService, site)
+        .run(site.pollInterval, site.warnOnNetworkError)
+    })
   }
 }

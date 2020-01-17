@@ -1,58 +1,72 @@
 package me.zanini.froniussolar.metrics
 
 import io.prometheus.client.Gauge
-import me.zanini.froniussolar.metrics.Constants.SITE_METRICS_NS
+import me.zanini.froniussolar.metrics.Constants.SiteMetricsNamespace
 
 object SiteMetrics {
   private val commonLabels = List("site")
 
-  private case class GaugeMetric(name: String,
-                                 help: String,
-                                 labelNames: List[String]) {
-    def register: Gauge =
-      Gauge
-        .build(name, help)
-        .namespace(SITE_METRICS_NS)
-        .labelNames(labelNames: _*)
-        .register()
-  }
-
   val modeMetric: Gauge =
-    GaugeMetric("mode",
-                "0 = not in this mode, 1 = running in this mode",
-                commonLabels ++ List("mode")).register
+    registerMetric(
+      "mode",
+      "0 = not in this mode, 1 = running in this mode",
+      commonLabels ++ List("mode")
+    )
 
   val batteryStandbyMetric: Gauge =
-    GaugeMetric("battery_standby", "1 = standby, 0 = off", commonLabels).register
+    registerMetric("battery_standby", "1 = standby, 0 = off", commonLabels)
 
   val backupModeMetric: Gauge =
-    GaugeMetric("backup_mode", "1 = active, 0 = inactive", commonLabels).register
+    registerMetric("backup_mode", "1 = active, 0 = inactive", commonLabels)
 
   val powerMetric: Gauge =
-    GaugeMetric("power_watts", "Instant power", commonLabels ++ List("device")).register
+    registerMetric(
+      "power_watts",
+      "Instant power",
+      commonLabels ++ List("device")
+    )
 
   val energyMetric: Gauge =
-    GaugeMetric("energy_watthours",
-                "Cumulative energy",
-                commonLabels ++ List("period")).register
+    registerMetric(
+      "energy_watthours",
+      "Cumulative energy",
+      commonLabels ++ List("period")
+    )
 
   val selfConsumptionPercentMetric: Gauge =
-    GaugeMetric("self_consumption_percent",
-                "Current relative self consumption in %",
-                commonLabels).register
+    registerMetric(
+      "self_consumption_percent",
+      "Current relative self consumption in %",
+      commonLabels
+    )
 
   val autonomyPercentMetric: Gauge =
-    GaugeMetric("autonomy_percent",
-                "Current relative autonomy in %",
-                commonLabels).register
+    registerMetric(
+      "autonomy_percent",
+      "Current relative autonomy in %",
+      commonLabels
+    )
 
   val meterLocationMetric: Gauge =
-    GaugeMetric("meter_location",
-                "unknown = backup power",
-                commonLabels ++ List("location")).register
+    registerMetric(
+      "meter_location",
+      "unknown = backup power",
+      commonLabels ++ List("location")
+    )
 
   val lastSuccessfulQueryMetric: Gauge =
-    GaugeMetric("last_successful_query",
-                "When the site was last successfully queried",
-                commonLabels).register
+    registerMetric(
+      "last_successful_query",
+      "When the site was last successfully queried",
+      commonLabels
+    )
+
+  private def registerMetric(name: String,
+                             help: String,
+                             labelNames: List[String]) =
+    Gauge
+      .build(name, help)
+      .namespace(SiteMetricsNamespace)
+      .labelNames(labelNames: _*)
+      .register()
 }
